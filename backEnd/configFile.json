@@ -1,0 +1,64 @@
+{
+  "vms": [
+    {
+      "cpu": 2,
+      "memory": 4,
+      "location": "us-west-1",
+      "csp": "aws",
+      "processing_time": 298,
+      "links": [
+        {
+          "vm": 2,
+          "data_rate": 100
+        },
+        {
+          "vm": 3,
+          "data_rate": 50
+        }
+      ]
+    },
+    {
+      "cpu": 4,
+      "memory": 8,
+      "location": "us-east-1",
+      "csp": "aws",
+      "processing_time": 96540,
+      "links": [
+        {
+          "vm": 1,
+          "data_rate": 100
+        },
+        {
+          "vm": 4,
+          "data_rate": 75
+        }
+      ]
+    },
+    {
+      "cpu": 4,
+      "memory": 16,
+      "location": "westus",
+      "csp": "azur",
+      "processing_time": 5404,
+      "links": [
+        {
+          "vm": 1,
+          "data_rate": 50
+        }
+      ]
+    },
+    {
+      "cpu": 8,
+      "memory": 32,
+      "location": "eastus",
+      "csp": "azur",
+      "processing_time": 35402,
+      "links": [
+        {
+          "vm": 2,
+          "data_rate": 75
+        }
+      ]
+    }
+  ]
+}

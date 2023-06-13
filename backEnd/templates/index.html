@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>VM Configuration</title>
+</head>
+<body>
+    <h1>VM Configuration</h1>
+
+    {% if show_form %}
+    <form method="POST" action="/">
+        <label for="num_vms">Number of VMs:</label>
+        <input type="number" id="num_vms" name="num_vms" required><br><br>
+
+        {% for i in range(num_vms) %}
+        <h3>VM {{ i + 1 }}</h3>
+        <label for="cpu{{ i }}">CPU:</label>
+        <input type="number" id="cpu{{ i }}" name="cpu{{ i }}" required><br>
+
+        <label for="memory{{ i }}">Memory:</label>
+        <input type="number" id="memory{{ i }}" name="memory{{ i }}" required><br>
+
+        <label for="csp{{ i }}">CSP:</label>
+        <select id="csp{{ i }}" name="csp{{ i }}" required>
+            <option value="aws">AWS</option>
+            <option value="azure">Azure</option>
+        </select><br>
+
+        <label for="location{{ i }}">Location:</label>
+        <input type="text" id="location{{ i }}" name="location{{ i }}" required><br><br>
+
+        {% endfor %}
+
+        {% for i in range(num_vms) %}
+        <h3>Link to VM {{ i + 1 }}</h3>
+        {% for j in range(num_vms) %}
+        {% if i != j %}
+        <label for="data_rate{{ i }}_{{ j }}">Data Rate (VM {{ i + 1 }} to VM {{ j + 1 }}):</label>
+        <input type="number" id="data_rate{{ i }}_{{ j }}" name="data_rate{{ i }}_{{ j }}" required><br>
+        {% endif %}
+        {% endfor %}
+        {% endfor %}
+
+        <br>
+        <input type="submit" value="Calculate Costs">
+    </form>
+    {% endif %}
+
+    {% if show_results %}
+    <h2>Results</h2>
+    {% for i, vm in enumerate(vms) %}
+    <h3>VM {{ i + 1 }}</h3>
+    <p>ID: {{ vm.id }}</p>
+    <p>CPU: {{ vm.cpu }}</p>
+    <p>Memory: {{ vm.memory }}</p>
+    <p>CSP: {{ vm.csp }}</p>
+    <p>Location: {{ vm.location }}</p>
+    <p>Hourly Rate: {{ vm.hourrate }}</p>
+    <br>
+    {% endfor %}
+
+    <h3>Cost Breakdown</h3>
+    <p>Operational_cost: {{ operational_cost }}</p>
+    <p>Network_cost: {{ network_cost }}</p>
+    <p>Total_cost: {{ total_cost }}</p>
+    {% endif %}
+</body>
+</html>

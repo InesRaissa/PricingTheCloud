@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>VM Configuration</title>
+</head>
+<body>
+    {% if show_form %}
+        <form method="POST" action="/">
+            <label for="num_vms">Number of VMs:</label>
+            <input type="number" id="num_vms" name="num_vms" required><br><br>
+
+            <div id="vm-parameters"></div>
+
+            <h3>Data Rates</h3>
+            <div id="data-rates"></div>
+
+            <br>
+            <input type="submit" value="Compute Cost">
+        </form>
+    {% endif %}
+
+    {% if show_results %}
+        <h2>Cost Calculation Results:</h2>
+        <p>Operational Cost: {{ total_operational_cost }}</p>
+        <p>Network Cost: {{ total_network_cost }}</p>
+        <p>Total Cost: {{ total_costs }}</p>
+    
+        
+        {% for vm in vms %}
+            <h3>VM {{ loop.index }}</h3>
+            <p>ID: {{ vm.id }}</p>
+            <p>CPU: {{ vm.cpu }}</p>
+            <p>Memory: {{ vm.memory }}</p>
+            <p>Hourly Rate: {{ vm.hourrate }}</p>
+            <p>Location: {{ vm.location }}</p>
+            <p>CSP: {{ vm.csp }}</p>
+            
+        {% endfor %}
+    {% endif %}
+
+    <script>
+        document.getElementById("num_vms").addEventListener("input", function() {
+            var numVms = parseInt(this.value);
+
+            var vmParameters = document.getElementById("vm-parameters");
+            vmParameters.innerHTML = "";
+
+            for (var i = 0; i < numVms; i++) {
+                var vmIndex = i + 1;
+                var vmDiv = document.createElement("div");
+
+                var cpuLabel = document.createElement("label");
+                cpuLabel.setAttribute("for", "cpu" + i);
+                cpuLabel.innerHTML = "CPU:";
+                vmDiv.appendChild(cpuLabel);
+
+                var cpuInput = document.createElement("input");
+                cpuInput.setAttribute("type", "number");
+                cpuInput.setAttribute("id", "cpu" + i);
+                cpuInput.setAttribute("name", "cpu" + i);
+                cpuInput.setAttribute("required", true);
+                vmDiv.appendChild(cpuInput);
+
+
+                // memory parameter
+                var memoryLabel = document.createElement("label");
+                memoryLabel.setAttribute("for", "memory" + i);
+                memoryLabel.innerHTML = "Memory:";
+                vmDiv.appendChild(memoryLabel);
+
+                var memoryInput = document.createElement("input");
+                memoryInput.setAttribute("type", "number");
+                memoryInput.setAttribute("id", "memory" + i);
+                memoryInput.setAttribute("name", "memory" + i);
+                memoryInput.setAttribute("required", true);
+                vmDiv.appendChild(memoryInput);
+
+                //location parameter
+                var locationLabel = document.createElement("label");
+                locationLabel.setAttribute("for", "location" + i);
+                locationLabel.innerHTML = "CPU:";
+                vmDiv.appendChild(locationLabel);
+
+                var locationInput = document.createElement("input");
+                locationInput.setAttribute("type", "number");
+                locationInput.setAttribute("id", "location" + i);
+                locationInput.setAttribute("name", "location" + i);
+                locationInput.setAttribute("required", true);
+                vmDiv.appendChild(locationInput);
+
+                //csp parameter
+                var cspLabel = document.createElement("label");
+                cspLabel.setAttribute("for", "csp" + i);
+                cspLabel.innerHTML = "CSP:";
+                vmDiv.appendChild(cspLabel);
+
+                var cspInput = document.createElement("input");
+                cspInput.setAttribute("type", "number");
+                cspInput.setAttribute("id", "csp" + i);
+                cspInput.setAttribute("name", "csp" + i);
+                cspInput.setAttribute("required", true);
+                vmDiv.appendChild(cspInput);
+
+
+                var searchButton = document.createElement("button");
+                searchButton.innerHTML = "Find Suitable VM";
+                searchButton.addEventListener("click", findSuitableVM.bind(null, i));
+                vmDiv.appendChild(searchButton);
+
+                vmParameters.appendChild(vmDiv);
+            }
+
+            var dataRates = document.getElementById("data-rates");
+            dataRates.innerHTML = "";
+
+            for (var i = 0; i < numVms; i++) {
+                for (var j = 0; j < numVms; j++) {
+                    if (i !== j) {
+                        var dataRateLabel = document.createElement("label");
+                        dataRateLabel.setAttribute("for", "data_rate" + i + "_" + j);
+                        dataRateLabel.innerHTML = "Data Rate (VM" + (i + 1) + " to VM" + (j + 1) + "):";
+                        dataRates.appendChild(dataRateLabel);
+
+                        var dataRateInput = document.createElement("input");
+                        dataRateInput.setAttribute("type", "number");
+                        dataRateInput.setAttribute("id", "data_rate" + i + "_" + j);
+                        dataRateInput.setAttribute("name", "data_rate" + i + "_" + j);
+                        dataRateInput.setAttribute("required", true);
+                        dataRates.appendChild(dataRateInput);
+
+                        dataRates.appendChild(document.createElement("br"));
+                    }
+                }
+            }
+        });
+
+        function findSuitableVM(vmIndex) {
+            var id = null
+            var cpu = parseInt(document.getElementById("cpu" + vmIndex).value);
+            var memory = parseInt(document.getElementById("memory" + vmIndex).value);
+            var hourrate = null
+            var location = document.getElementById("location" + vmIndex).value;
+            var csp = document.getElementById("csp" + vmIndex).value;
+            
+
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/search_vm", true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    var response = JSON.parse(xhr.responseText);
+                    // Update the form fields with the retrieved suitable VM data
+                    document.getElementById("cpu" + vmIndex).value = response.cpu;
+                    document.getElementById("memory" + vmIndex).value = response.memory;
+                    document.getElementById("csp" + vmIndex).value = response.csp;
+                    document.getElementById("location" + vmIndex).value = response.location;
+                }
+            };
+
+            var data = JSON.stringify({ "cpu": cpu, "memory": memory, "csp": csp, "location": location });
+            xhr.send(data);
+        }
+    </script>
+</body>
+</html>
